@@ -1,0 +1,73 @@
+﻿
+@model BigSchool.ViewModels.CoursesViewModel
+@{
+    ViewBag.Title = "Home Page";
+}
+
+
+    <ul class="course">
+        @foreach (var course in Model.UpcommingCourses)
+        {
+            <li>
+                <div class="date">
+                    <div class="month">
+                        @course.DateTime.ToString("MM");
+                    </div>
+                    <div class="day">
+                        @course.DateTime.ToString("dd");
+                    </div>
+                </div>
+                <div class="details">
+                    <span class="lecturer">
+                        @course.Lecturer.Name
+                        @if (Model.ShowAction)
+                        {
+                            <button class="btn btn-default btn-sm js-toggle-follow" data-user-id="@course.LecturerId">Follow</button>
+                        }
+                    </span>
+                    <span class="category">
+                        @course.Category.Name
+                    </span>
+                    @if (Model.ShowAction)
+                    {
+                        <button data-course-id="@course.Id" class="btn btn-default btn-sm js-toggle-attendace">Goging?</button>
+                    }
+                </div>
+            </li>
+        }
+    </ul>
+
+
+@section scripts
+{
+
+    <script>
+        $(document).ready(function () {
+            $(".js-toggle-attendace").click(function (e) {
+                var button = $(e.target);
+                $.post("/api/attendaces", { courseId: button.attr("data-course-id") })
+                    .done(function () {
+                        button
+                            .removeClass("btn-default")
+                            .addClass("btn-info")
+                            .text("Going");
+                    })
+                    .fail(function () {
+                        alert("Something failed!");
+                    });
+            });
+
+            $(".js-toggle-follow").click(function (e) {
+                var button = $(e.target);
+                $.post("/api/followings", { followeeId: button.attr("data-user-id") })
+                    .done(function () {
+                        button                            
+                            .text("Following");
+                    })
+                    .fail(function () {
+                        alert("Something failed!");
+                    });
+            });
+        });
+    </script>    
+}
